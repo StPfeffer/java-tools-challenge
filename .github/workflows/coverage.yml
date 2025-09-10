@@ -4,14 +4,10 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - dev
-      - stage
-      - production
+      - main
   pull_request:
     branches:
-      - dev
-      - stage
-      - production
+      - main
 
 jobs:
   coverage:

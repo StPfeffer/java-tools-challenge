@@ -6,9 +6,7 @@ on:
     - cron: '0 0 * * 0'
   push:
     branches:
-      - dev
-      - stage
-      - production
+      - main
 
 permissions:
   contents: read

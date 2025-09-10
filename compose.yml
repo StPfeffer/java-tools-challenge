@@ -1,0 +1,10 @@
+services:
+
+  api:
+    container_name: java-tools-challenge-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: on-failure
+    ports:
+      - "8080:8080"
