@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: java-tools-challenge
+
+  profiles:
+    active: dev
+
+  jackson:
+    default-property-inclusion: NON_NULL
+    date-format: dd/MM/yyyy HH:mm:ss
+    time-zone: America/Sao_Paulo
+
+server:
+  port: 8080
+
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+
+logging:
+  level:
+    com.pfeffer.javatoolschallenge: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
