@@ -17,21 +17,12 @@ Architecture**, com clara separação de responsabilidades:
 - **Domain Layer**: Contém entidades, DTOs, requests e enums do domínio
 - **Exception Layer**: Trata exceções específicas do domínio
 
-### Padrões Utilizados
-
-- **Repository Pattern**: Para abstração da camada de dados
-- **Service Pattern**: Para encapsulamento da lógica de negócio
-- **Mapper Pattern**: Para conversão entre camadas de dados
-- **DTO Pattern**: Para transferência de dados entre camadas
-- **Builder Pattern**: Para construção consistente de objetos
-- **Exception Handler**: Para tratamento global de exceções
-
 ## Tecnologias
 
 - **Java 21**
 - **Spring Boot 3.5.5**
 - **Spring Web** - Para criação dos endpoints REST
-- **Lombok** - Para redução de código boilerplate e Builder pattern
+- **Lombok** - Para redução de código boilerplate
 - **JUnit 5** - Para testes unitários
 - **Mockito** - Para mocks nos testes
 - **Maven** - Para gerenciamento de dependências
@@ -66,9 +57,9 @@ src/
 - **Endpoint**: `POST /api/v1/pagamentos`
 - **Funcionalidade**: Processa uma nova transação de pagamento
 - **Validações**:
-  - ID da transação deve ser único
-  - Forma de pagamento deve ser válida (AVISTA, PARCELADO_LOJA, PARCELADO_EMISSOR)
-  - À vista deve ter 1 parcela, parcelado deve ter > 1 parcela
+    - ID da transação deve ser único
+    - Forma de pagamento deve ser válida (AVISTA, PARCELADO_LOJA, PARCELADO_EMISSOR)
+    - À vista deve ter 1 parcela, parcelado deve ter > 1 parcela
 - **Resposta**: Transação enriquecida com NSU, código de autorização e status
 
 ### 2. Consulta de Transação
@@ -116,14 +107,14 @@ src/
 1. **Clone o repositório**
 
 ```bash
-git clone <url-do-repositorio>
+git clone https://github.com/StPfeffer/java-tools-challenge.git
 cd java-tools-challenge
 ```
 
 2. **Compile e execute os testes**
 
 ```bash
-./mvnw clean test
+./mvnw clean install
 ```
 
 3. **Execute a aplicação**
