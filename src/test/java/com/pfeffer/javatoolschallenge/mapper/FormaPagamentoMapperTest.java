@@ -11,16 +11,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FormaPagamentoMapperTest {
 
-    private FormaPagamentoMapper mapper;
-
     private FormaPagamentoRequest request;
 
     private FormaPagamento entity;
 
     @BeforeEach
     void setUp() {
-        mapper = new FormaPagamentoMapper();
-
         request = FormaPagamentoRequest.builder()
                 .tipo(TipoFormaPagamento.AVISTA)
                 .parcelas(1)
@@ -34,7 +30,7 @@ class FormaPagamentoMapperTest {
 
     @Test
     void requestToEntity_DeveConverterCorretamente() {
-        FormaPagamento result = mapper.requestToEntity(request);
+        FormaPagamento result = FormaPagamentoMapper.requestToEntity(request);
 
         assertNotNull(result);
         assertEquals(request.getTipo(), result.getTipo());
@@ -43,7 +39,7 @@ class FormaPagamentoMapperTest {
 
     @Test
     void entityToDto_DeveConverterCorretamente() {
-        FormaPagamentoDTO result = mapper.entityToDto(entity);
+        FormaPagamentoDTO result = FormaPagamentoMapper.entityToDto(entity);
 
         assertNotNull(result);
         assertEquals(entity.getTipo(), result.getTipo());
@@ -52,7 +48,7 @@ class FormaPagamentoMapperTest {
 
     @Test
     void requestToEntity_ComRequestNull_DeveRetornarNull() {
-        FormaPagamento result = mapper.requestToEntity(null);
+        FormaPagamento result = FormaPagamentoMapper.requestToEntity(null);
         assertNull(result);
     }
 
@@ -61,7 +57,7 @@ class FormaPagamentoMapperTest {
         request.setTipo(TipoFormaPagamento.PARCELADO_LOJA);
         request.setParcelas(3);
 
-        FormaPagamento result = mapper.requestToEntity(request);
+        FormaPagamento result = FormaPagamentoMapper.requestToEntity(request);
 
         assertNotNull(result);
         assertEquals(TipoFormaPagamento.PARCELADO_LOJA, result.getTipo());
@@ -73,7 +69,7 @@ class FormaPagamentoMapperTest {
         request.setTipo(TipoFormaPagamento.PARCELADO_EMISSOR);
         request.setParcelas(12);
 
-        FormaPagamento result = mapper.requestToEntity(request);
+        FormaPagamento result = FormaPagamentoMapper.requestToEntity(request);
 
         assertNotNull(result);
         assertEquals(TipoFormaPagamento.PARCELADO_EMISSOR, result.getTipo());
@@ -85,7 +81,7 @@ class FormaPagamentoMapperTest {
         entity.setTipo(TipoFormaPagamento.PARCELADO_LOJA);
         entity.setParcelas(6);
 
-        FormaPagamentoDTO result = mapper.entityToDto(entity);
+        FormaPagamentoDTO result = FormaPagamentoMapper.entityToDto(entity);
 
         assertNotNull(result);
         assertEquals(TipoFormaPagamento.PARCELADO_LOJA, result.getTipo());
@@ -96,7 +92,7 @@ class FormaPagamentoMapperTest {
     void requestToEntity_ComTipoNull_DeveManterNull() {
         request.setTipo(null);
 
-        FormaPagamento result = mapper.requestToEntity(request);
+        FormaPagamento result = FormaPagamentoMapper.requestToEntity(request);
 
         assertNotNull(result);
         assertNull(result.getTipo());
@@ -107,7 +103,7 @@ class FormaPagamentoMapperTest {
     void requestToEntity_ComParcelasNull_DeveManterNull() {
         request.setParcelas(null);
 
-        FormaPagamento result = mapper.requestToEntity(request);
+        FormaPagamento result = FormaPagamentoMapper.requestToEntity(request);
 
         assertNotNull(result);
         assertEquals(request.getTipo(), result.getTipo());
@@ -119,7 +115,7 @@ class FormaPagamentoMapperTest {
         entity.setTipo(null);
         entity.setParcelas(null);
 
-        FormaPagamentoDTO result = mapper.entityToDto(entity);
+        FormaPagamentoDTO result = FormaPagamentoMapper.entityToDto(entity);
 
         assertNotNull(result);
         assertNull(result.getTipo());

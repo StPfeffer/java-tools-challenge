@@ -1,7 +1,5 @@
 package com.pfeffer.javatoolschallenge.mapper;
 
-import com.pfeffer.javatoolschallenge.domain.dto.DescricaoTransacaoDTO;
-import com.pfeffer.javatoolschallenge.domain.dto.FormaPagamentoDTO;
 import com.pfeffer.javatoolschallenge.domain.dto.TransacaoDTO;
 import com.pfeffer.javatoolschallenge.domain.entity.DescricaoTransacao;
 import com.pfeffer.javatoolschallenge.domain.entity.FormaPagamento;
@@ -13,29 +11,13 @@ import com.pfeffer.javatoolschallenge.domain.request.FormaPagamentoRequest;
 import com.pfeffer.javatoolschallenge.domain.request.PagamentoRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 class TransacaoMapperTest {
-
-    @Mock
-    private DescricaoTransacaoMapper descricaoMapper;
-
-    @Mock
-    private FormaPagamentoMapper formaPagamentoMapper;
-
-    @InjectMocks
-    private TransacaoMapper transacaoMapper;
 
     private PagamentoRequest pagamentoRequest;
 
@@ -44,10 +26,6 @@ class TransacaoMapperTest {
     private DescricaoTransacao descricaoEntity;
 
     private FormaPagamento formaPagamentoEntity;
-
-    private DescricaoTransacaoDTO descricaoDTO;
-
-    private FormaPagamentoDTO formaPagamentoDTO;
 
     @BeforeEach
     void setUp() {
@@ -89,64 +67,95 @@ class TransacaoMapperTest {
                 .descricao(descricaoEntity)
                 .formaPagamento(formaPagamentoEntity)
                 .build();
-
-        descricaoDTO = DescricaoTransacaoDTO.builder()
-                .valor(new BigDecimal("500.50"))
-                .dataHora(LocalDateTime.of(2021, 5, 1, 18, 30, 0))
-                .estabelecimento("PetShop Mundo cão")
-                .nsu("1234567890")
-                .codigoAutorizacao("147258369")
-                .status(StatusTransacao.AUTORIZADO)
-                .build();
-
-        formaPagamentoDTO = FormaPagamentoDTO.builder()
-                .tipo(TipoFormaPagamento.AVISTA)
-                .parcelas(1)
-                .build();
     }
 
     @Test
     void requestToEntity_DeveConverterCorretamente() {
-        when(descricaoMapper.requestToEntity(pagamentoRequest.getDescricao())).thenReturn(descricaoEntity);
-        when(formaPagamentoMapper.requestToEntity(pagamentoRequest.getFormaPagamento())).thenReturn(formaPagamentoEntity);
-
-        Transacao result = transacaoMapper.requestToEntity(pagamentoRequest);
+        Transacao result = TransacaoMapper.requestToEntity(pagamentoRequest);
 
         assertNotNull(result);
         assertEquals("4444********1234", result.getCartao());
         assertEquals("1000235689000001", result.getId());
         assertNotNull(result.getDescricao());
         assertNotNull(result.getFormaPagamento());
-        verify(descricaoMapper).requestToEntity(pagamentoRequest.getDescricao());
-        verify(formaPagamentoMapper).requestToEntity(pagamentoRequest.getFormaPagamento());
+
+        assertEquals(new BigDecimal("500.50"), result.getDescricao().getValor());
+        assertEquals(LocalDateTime.of(2021, 5, 1, 18, 30, 0), result.getDescricao().getDataHora());
+        assertEquals("PetShop Mundo cão", result.getDescricao().getEstabelecimento());
+
+        assertEquals(TipoFormaPagamento.AVISTA, result.getFormaPagamento().getTipo());
+        assertEquals(1, result.getFormaPagamento().getParcelas());
     }
 
     @Test
     void entityToDto_DeveConverterCorretamente() {
-        when(descricaoMapper.entityToDto(descricaoEntity)).thenReturn(descricaoDTO);
-        when(formaPagamentoMapper.entityToDto(formaPagamentoEntity)).thenReturn(formaPagamentoDTO);
-
-        TransacaoDTO result = transacaoMapper.entityToDto(transacao);
+        TransacaoDTO result = TransacaoMapper.entityToDto(transacao);
 
         assertNotNull(result);
         assertEquals("4444********1234", result.getCartao());
         assertEquals("1000235689000001", result.getId());
         assertNotNull(result.getDescricao());
         assertNotNull(result.getFormaPagamento());
-        verify(descricaoMapper).entityToDto(descricaoEntity);
-        verify(formaPagamentoMapper).entityToDto(formaPagamentoEntity);
+
+        assertEquals(new BigDecimal("500.50"), result.getDescricao().getValor());
+        assertEquals(LocalDateTime.of(2021, 5, 1, 18, 30, 0), result.getDescricao().getDataHora());
+        assertEquals("PetShop Mundo cão", result.getDescricao().getEstabelecimento());
+        assertEquals("1234567890", result.getDescricao().getNsu());
+        assertEquals("147258369", result.getDescricao().getCodigoAutorizacao());
+        assertEquals(StatusTransacao.AUTORIZADO, result.getDescricao().getStatus());
+
+        assertEquals(TipoFormaPagamento.AVISTA, result.getFormaPagamento().getTipo());
+        assertEquals(1, result.getFormaPagamento().getParcelas());
     }
 
     @Test
     void requestToEntity_ComRequestNull_DeveRetornarNull() {
-        Object result = transacaoMapper.requestToEntity(null);
+        Transacao result = TransacaoMapper.requestToEntity(null);
+
         assertNull(result);
     }
 
     @Test
     void entityToDto_ComEntityNull_DeveRetornarNull() {
-        Object result = transacaoMapper.entityToDto(null);
+        TransacaoDTO result = TransacaoMapper.entityToDto(null);
+
         assertNull(result);
+    }
+
+    @Test
+    void requestToEntity_ComDescricaoEFormaPagamentoNulos_DeveManterNulos() {
+        PagamentoRequest requestComNulos = PagamentoRequest.builder()
+                .cartao("1111********5678")
+                .id("2000000000000001")
+                .descricao(null)
+                .formaPagamento(null)
+                .build();
+
+        Transacao result = TransacaoMapper.requestToEntity(requestComNulos);
+
+        assertNotNull(result);
+        assertEquals("1111********5678", result.getCartao());
+        assertEquals("2000000000000001", result.getId());
+        assertNull(result.getDescricao());
+        assertNull(result.getFormaPagamento());
+    }
+
+    @Test
+    void entityToDto_ComDescricaoEFormaPagamentoNulos_DeveManterNulos() {
+        Transacao transacaoComNulos = Transacao.builder()
+                .cartao("1111********5678")
+                .id("2000000000000001")
+                .descricao(null)
+                .formaPagamento(null)
+                .build();
+
+        TransacaoDTO result = TransacaoMapper.entityToDto(transacaoComNulos);
+
+        assertNotNull(result);
+        assertEquals("1111********5678", result.getCartao());
+        assertEquals("2000000000000001", result.getId());
+        assertNull(result.getDescricao());
+        assertNull(result.getFormaPagamento());
     }
 
 }

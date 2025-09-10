@@ -23,7 +23,7 @@ public class PagamentoController {
         try {
             PagamentoDTO response = pagamentoService.processarPagamento(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -33,7 +33,7 @@ public class PagamentoController {
         try {
             PagamentoDTO response = pagamentoService.consultarTransacao(id);
             return ResponseEntity.ok(response);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
     }
@@ -49,7 +49,7 @@ public class PagamentoController {
         try {
             PagamentoDTO response = pagamentoService.estornarTransacao(id);
             return ResponseEntity.ok(response);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
         }
     }

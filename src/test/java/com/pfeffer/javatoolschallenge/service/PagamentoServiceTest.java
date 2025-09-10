@@ -12,8 +12,6 @@ import com.pfeffer.javatoolschallenge.domain.request.FormaPagamentoRequest;
 import com.pfeffer.javatoolschallenge.domain.request.PagamentoRequest;
 import com.pfeffer.javatoolschallenge.exception.TransacaoJaExisteException;
 import com.pfeffer.javatoolschallenge.exception.TransacaoNotFoundException;
-import com.pfeffer.javatoolschallenge.mapper.PagamentoMapper;
-import com.pfeffer.javatoolschallenge.mapper.TransacaoMapper;
 import com.pfeffer.javatoolschallenge.repository.TransacaoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,12 +37,6 @@ class PagamentoServiceTest {
 
     @Mock
     private TransacaoRepository transacaoRepository;
-
-    @Mock
-    private PagamentoMapper pagamentoMapper;
-
-    @Mock
-    private TransacaoMapper transacaoMapper;
 
     @InjectMocks
     private PagamentoService pagamentoService;
@@ -94,103 +86,77 @@ class PagamentoServiceTest {
 
     @Test
     void processarPagamento_QuandoTransacaoValida_DeveRetornarPagamentoResponse() {
-        PagamentoDTO expectedResponse = PagamentoDTO.builder()
-                .transacao(TransacaoDTO.builder()
-                        .id("1000235689000001")
-                        .cartao("4444********1234")
-                        .build())
-                .build();
-
-        when(pagamentoMapper.requestToEntity(pagamentoRequest)).thenReturn(transacao);
         when(transacaoRepository.existsById(anyString())).thenReturn(false);
         when(transacaoRepository.save(any(Transacao.class))).thenReturn(transacao);
-        when(pagamentoMapper.entityToDto(any(Transacao.class))).thenReturn(expectedResponse);
 
         PagamentoDTO response = pagamentoService.processarPagamento(pagamentoRequest);
 
         assertNotNull(response);
         assertNotNull(response.getTransacao());
+        assertEquals("1000235689000001", response.getTransacao().getId());
+        assertEquals("4444********1234", response.getTransacao().getCartao());
+        verify(transacaoRepository).existsById("1000235689000001");
         verify(transacaoRepository).save(any(Transacao.class));
-        verify(pagamentoMapper).requestToEntity(pagamentoRequest);
-        verify(pagamentoMapper).entityToDto(any(Transacao.class));
     }
 
     @Test
     void processarPagamento_QuandoTransacaoJaExiste_DeveLancarTransacaoJaExisteException() {
-        when(pagamentoMapper.requestToEntity(pagamentoRequest)).thenReturn(transacao);
         when(transacaoRepository.existsById(anyString())).thenReturn(true);
 
-        assertThrows(TransacaoJaExisteException.class, () -> {
-            pagamentoService.processarPagamento(pagamentoRequest);
-        });
+        assertThrows(TransacaoJaExisteException.class, () -> pagamentoService.processarPagamento(pagamentoRequest));
+
+        verify(transacaoRepository).existsById("1000235689000001");
     }
 
     @Test
     void consultarTransacao_QuandoTransacaoExiste_DeveRetornarPagamentoResponse() {
-        PagamentoDTO expectedResponse = PagamentoDTO.builder()
-                .transacao(TransacaoDTO.builder()
-                        .id("1000235689000001")
-                        .cartao("4444********1234")
-                        .build())
-                .build();
-
         when(transacaoRepository.findById(anyString())).thenReturn(Optional.of(transacao));
-        when(pagamentoMapper.entityToDto(transacao)).thenReturn(expectedResponse);
 
         PagamentoDTO response = pagamentoService.consultarTransacao("1000235689000001");
 
         assertNotNull(response);
+        assertNotNull(response.getTransacao());
         assertEquals("1000235689000001", response.getTransacao().getId());
-        verify(pagamentoMapper).entityToDto(transacao);
+        assertEquals("4444********1234", response.getTransacao().getCartao());
+        verify(transacaoRepository).findById("1000235689000001");
     }
 
     @Test
     void consultarTransacao_QuandoTransacaoNaoExiste_DeveLancarTransacaoNotFoundException() {
         when(transacaoRepository.findById(anyString())).thenReturn(Optional.empty());
 
-        assertThrows(TransacaoNotFoundException.class, () -> {
-            pagamentoService.consultarTransacao("999999999");
-        });
+        assertThrows(TransacaoNotFoundException.class, () -> pagamentoService.consultarTransacao("999999999"));
+
+        verify(transacaoRepository).findById("999999999");
     }
 
     @Test
     void consultarTodasTransacoes_DeveRetornarListaDeTransacoes() {
         List<Transacao> transacoes = Collections.singletonList(transacao);
-        TransacaoDTO transacaoDTO = TransacaoDTO.builder()
-                .id("1000235689000001")
-                .cartao("4444********1234")
-                .build();
-
         when(transacaoRepository.findAll()).thenReturn(transacoes);
-        when(transacaoMapper.entityToDto(transacao)).thenReturn(transacaoDTO);
 
         List<TransacaoDTO> resultado = pagamentoService.consultarTodasTransacoes();
 
         assertNotNull(resultado);
         assertEquals(1, resultado.size());
-        assertEquals("1000235689000001", resultado.get(0).getId());
-        verify(transacaoMapper).entityToDto(transacao);
+        assertEquals("1000235689000001", resultado.getFirst().getId());
+        assertEquals("4444********1234", resultado.getFirst().getCartao());
+        verify(transacaoRepository).findAll();
     }
 
     @Test
     void estornarTransacao_QuandoTransacaoAutorizada_DeveAlterarStatusParaCancelado() {
         transacao.getDescricao().setStatus(StatusTransacao.AUTORIZADO);
-        PagamentoDTO expectedResponse = PagamentoDTO.builder()
-                .transacao(TransacaoDTO.builder()
-                        .id("1000235689000001")
-                        .cartao("4444********1234")
-                        .build())
-                .build();
-
         when(transacaoRepository.findById(anyString())).thenReturn(Optional.of(transacao));
         when(transacaoRepository.save(any(Transacao.class))).thenReturn(transacao);
-        when(pagamentoMapper.entityToDto(any(Transacao.class))).thenReturn(expectedResponse);
 
         PagamentoDTO response = pagamentoService.estornarTransacao("1000235689000001");
 
         assertNotNull(response);
+        assertNotNull(response.getTransacao());
+        assertEquals(StatusTransacao.CANCELADO, transacao.getDescricao().getStatus());
+        verify(transacaoRepository).findById("1000235689000001");
         verify(transacaoRepository).save(any(Transacao.class));
-        verify(pagamentoMapper).entityToDto(any(Transacao.class));
     }
 
     @Test
@@ -198,9 +164,33 @@ class PagamentoServiceTest {
         transacao.getDescricao().setStatus(StatusTransacao.NEGADO);
         when(transacaoRepository.findById(anyString())).thenReturn(Optional.of(transacao));
 
-        assertThrows(IllegalStateException.class, () -> {
-            pagamentoService.estornarTransacao("1000235689000001");
-        });
+        assertThrows(IllegalStateException.class, () -> pagamentoService.estornarTransacao("1000235689000001"));
+
+        verify(transacaoRepository).findById("1000235689000001");
+    }
+
+    @Test
+    void processarPagamento_QuandoFormaPagamentoInvalida_DeveLancarIllegalArgumentException() {
+        pagamentoRequest.getFormaPagamento().setTipo(TipoFormaPagamento.AVISTA);
+        pagamentoRequest.getFormaPagamento().setParcelas(3);
+
+        when(transacaoRepository.existsById(anyString())).thenReturn(false);
+
+        assertThrows(IllegalArgumentException.class, () -> pagamentoService.processarPagamento(pagamentoRequest));
+
+        verify(transacaoRepository).existsById("1000235689000001");
+    }
+
+    @Test
+    void processarPagamento_QuandoParceladoComUmaParcela_DeveLancarIllegalArgumentException() {
+        pagamentoRequest.getFormaPagamento().setTipo(TipoFormaPagamento.PARCELADO_LOJA);
+        pagamentoRequest.getFormaPagamento().setParcelas(1);
+
+        when(transacaoRepository.existsById(anyString())).thenReturn(false);
+
+        assertThrows(IllegalArgumentException.class, () -> pagamentoService.processarPagamento(pagamentoRequest));
+
+        verify(transacaoRepository).existsById("1000235689000001");
     }
 
 }

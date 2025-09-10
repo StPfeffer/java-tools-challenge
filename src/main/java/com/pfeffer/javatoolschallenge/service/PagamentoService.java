@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Random;
+import java.util.random.RandomGenerator;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -29,14 +29,23 @@ public class PagamentoService {
 
     private final TransacaoRepository transacaoRepository;
 
-    private final PagamentoMapper pagamentoMapper;
+    private final RandomGenerator random = new SecureRandom();
 
-    private final TransacaoMapper transacaoMapper;
+    private static void validarFormaPagamento(Transacao transacao) {
+        TipoFormaPagamento tipo = transacao.getFormaPagamento().getTipo();
+        Integer parcelas = transacao.getFormaPagamento().getParcelas();
 
-    private final Random random = new SecureRandom();
+        if (TipoFormaPagamento.AVISTA == tipo && !parcelas.equals(1)) {
+            throw new IllegalArgumentException("Pagamento à vista deve ter apenas 1 parcela");
+        }
+
+        if (!(TipoFormaPagamento.AVISTA == tipo) && parcelas <= 1) {
+            throw new IllegalArgumentException("Pagamento parcelado deve ter mais de 1 parcela");
+        }
+    }
 
     public PagamentoDTO processarPagamento(PagamentoRequest request) {
-        Transacao transacao = pagamentoMapper.requestToEntity(request);
+        Transacao transacao = PagamentoMapper.requestToEntity(request);
 
         if (transacaoRepository.existsById(transacao.getId())) {
             throw new TransacaoJaExisteException("Transação com ID " + transacao.getId() + " já existe");
@@ -50,19 +59,19 @@ public class PagamentoService {
 
         transacaoRepository.save(transacao);
 
-        return pagamentoMapper.entityToDto(transacao);
+        return PagamentoMapper.entityToDto(transacao);
     }
 
     public PagamentoDTO consultarTransacao(String id) {
         Transacao transacao = transacaoRepository.findById(id)
                 .orElseThrow(() -> new TransacaoNotFoundException("Transação não encontrada com ID: " + id));
 
-        return pagamentoMapper.entityToDto(transacao);
+        return PagamentoMapper.entityToDto(transacao);
     }
 
     public List<TransacaoDTO> consultarTodasTransacoes() {
         return transacaoRepository.findAll().stream()
-                .map(transacaoMapper::entityToDto)
+                .map(TransacaoMapper::entityToDto)
                 .collect(Collectors.toList());
     }
 
@@ -70,7 +79,7 @@ public class PagamentoService {
         Transacao transacao = transacaoRepository.findById(id)
                 .orElseThrow(() -> new TransacaoNotFoundException("Transação não encontrada com ID: " + id));
 
-        if (!StatusTransacao.AUTORIZADO.equals(transacao.getDescricao().getStatus())) {
+        if (!(StatusTransacao.AUTORIZADO == transacao.getDescricao().getStatus())) {
             throw new IllegalStateException("Apenas transações autorizadas podem ser estornadas");
         }
 
@@ -78,20 +87,7 @@ public class PagamentoService {
 
         transacaoRepository.save(transacao);
 
-        return pagamentoMapper.entityToDto(transacao);
-    }
-
-    private void validarFormaPagamento(Transacao transacao) {
-        TipoFormaPagamento tipo = transacao.getFormaPagamento().getTipo();
-        Integer parcelas = transacao.getFormaPagamento().getParcelas();
-
-        if (TipoFormaPagamento.AVISTA.equals(tipo) && !parcelas.equals(1)) {
-            throw new IllegalArgumentException("Pagamento à vista deve ter apenas 1 parcela");
-        }
-
-        if (!TipoFormaPagamento.AVISTA.equals(tipo) && parcelas <= 1) {
-            throw new IllegalArgumentException("Pagamento parcelado deve ter mais de 1 parcela");
-        }
+        return PagamentoMapper.entityToDto(transacao);
     }
 
     private boolean simularAutorizacao() {

@@ -3,12 +3,13 @@ package com.pfeffer.javatoolschallenge.mapper;
 import com.pfeffer.javatoolschallenge.domain.dto.DescricaoTransacaoDTO;
 import com.pfeffer.javatoolschallenge.domain.entity.DescricaoTransacao;
 import com.pfeffer.javatoolschallenge.domain.request.DescricaoTransacaoRequest;
-import org.springframework.stereotype.Component;
 
-@Component
-public class DescricaoTransacaoMapper {
+public final class DescricaoTransacaoMapper {
 
-    public DescricaoTransacao requestToEntity(DescricaoTransacaoRequest request) {
+    private DescricaoTransacaoMapper() {
+    }
+
+    public static DescricaoTransacao requestToEntity(DescricaoTransacaoRequest request) {
         if (request == null) {
             return null;
         }
@@ -20,7 +21,7 @@ public class DescricaoTransacaoMapper {
                 .build();
     }
 
-    public DescricaoTransacaoDTO entityToDto(DescricaoTransacao entity) {
+    public static DescricaoTransacaoDTO entityToDto(DescricaoTransacao entity) {
         if (entity == null) {
             return null;
         }

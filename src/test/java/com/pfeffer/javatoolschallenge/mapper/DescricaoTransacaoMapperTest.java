@@ -14,16 +14,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class DescricaoTransacaoMapperTest {
 
-    private DescricaoTransacaoMapper mapper;
-
     private DescricaoTransacaoRequest request;
 
     private DescricaoTransacao entity;
 
     @BeforeEach
     void setUp() {
-        mapper = new DescricaoTransacaoMapper();
-
         request = DescricaoTransacaoRequest.builder()
                 .valor(new BigDecimal("500.50"))
                 .dataHora(LocalDateTime.of(2021, 5, 1, 18, 30, 0))
@@ -42,7 +38,7 @@ class DescricaoTransacaoMapperTest {
 
     @Test
     void requestToEntity_DeveConverterCorretamente() {
-        DescricaoTransacao result = mapper.requestToEntity(request);
+        DescricaoTransacao result = DescricaoTransacaoMapper.requestToEntity(request);
 
         assertNotNull(result);
         assertEquals(request.getValor(), result.getValor());
@@ -55,7 +51,7 @@ class DescricaoTransacaoMapperTest {
 
     @Test
     void entityToDto_DeveConverterCorretamente() {
-        DescricaoTransacaoDTO result = mapper.entityToDto(entity);
+        DescricaoTransacaoDTO result = DescricaoTransacaoMapper.entityToDto(entity);
 
         assertNotNull(result);
         assertEquals(entity.getValor(), result.getValor());
@@ -68,7 +64,7 @@ class DescricaoTransacaoMapperTest {
 
     @Test
     void requestToEntity_ComRequestNull_DeveRetornarNull() {
-        DescricaoTransacao result = mapper.requestToEntity(null);
+        DescricaoTransacao result = DescricaoTransacaoMapper.requestToEntity(null);
         assertNull(result);
     }
 
@@ -76,7 +72,7 @@ class DescricaoTransacaoMapperTest {
     void requestToEntity_ComValorNull_DeveManterNull() {
         request.setValor(null);
 
-        DescricaoTransacao result = mapper.requestToEntity(request);
+        DescricaoTransacao result = DescricaoTransacaoMapper.requestToEntity(request);
 
         assertNotNull(result);
         assertNull(result.getValor());
@@ -88,7 +84,7 @@ class DescricaoTransacaoMapperTest {
     void requestToEntity_ComDataHoraNull_DeveManterNull() {
         request.setDataHora(null);
 
-        DescricaoTransacao result = mapper.requestToEntity(request);
+        DescricaoTransacao result = DescricaoTransacaoMapper.requestToEntity(request);
 
         assertNotNull(result);
         assertEquals(request.getValor(), result.getValor());
@@ -100,7 +96,7 @@ class DescricaoTransacaoMapperTest {
     void requestToEntity_ComEstabelecimentoNull_DeveManterNull() {
         request.setEstabelecimento(null);
 
-        DescricaoTransacao result = mapper.requestToEntity(request);
+        DescricaoTransacao result = DescricaoTransacaoMapper.requestToEntity(request);
 
         assertNotNull(result);
         assertEquals(request.getValor(), result.getValor());
@@ -114,7 +110,7 @@ class DescricaoTransacaoMapperTest {
         entity.setCodigoAutorizacao(null);
         entity.setStatus(null);
 
-        DescricaoTransacaoDTO result = mapper.entityToDto(entity);
+        DescricaoTransacaoDTO result = DescricaoTransacaoMapper.entityToDto(entity);
 
         assertNotNull(result);
         assertEquals(entity.getValor(), result.getValor());

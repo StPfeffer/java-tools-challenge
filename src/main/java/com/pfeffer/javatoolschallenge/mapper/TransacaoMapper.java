@@ -3,18 +3,13 @@ package com.pfeffer.javatoolschallenge.mapper;
 import com.pfeffer.javatoolschallenge.domain.dto.TransacaoDTO;
 import com.pfeffer.javatoolschallenge.domain.entity.Transacao;
 import com.pfeffer.javatoolschallenge.domain.request.PagamentoRequest;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
-@Component
-@RequiredArgsConstructor
-public class TransacaoMapper {
+public final class TransacaoMapper {
 
-    private final DescricaoTransacaoMapper descricaoMapper;
+    private TransacaoMapper() {
+    }
 
-    private final FormaPagamentoMapper formaPagamentoMapper;
-
-    public Transacao requestToEntity(PagamentoRequest request) {
+    public static Transacao requestToEntity(PagamentoRequest request) {
         if (request == null) {
             return null;
         }
@@ -22,12 +17,12 @@ public class TransacaoMapper {
         return Transacao.builder()
                 .cartao(request.getCartao())
                 .id(request.getId())
-                .descricao(descricaoMapper.requestToEntity(request.getDescricao()))
-                .formaPagamento(formaPagamentoMapper.requestToEntity(request.getFormaPagamento()))
+                .descricao(DescricaoTransacaoMapper.requestToEntity(request.getDescricao()))
+                .formaPagamento(FormaPagamentoMapper.requestToEntity(request.getFormaPagamento()))
                 .build();
     }
 
-    public TransacaoDTO entityToDto(Transacao transacao) {
+    public static TransacaoDTO entityToDto(Transacao transacao) {
         if (transacao == null) {
             return null;
         }
@@ -35,8 +30,8 @@ public class TransacaoMapper {
         return TransacaoDTO.builder()
                 .id(transacao.getId())
                 .cartao(transacao.getCartao())
-                .descricao(descricaoMapper.entityToDto(transacao.getDescricao()))
-                .formaPagamento(formaPagamentoMapper.entityToDto(transacao.getFormaPagamento()))
+                .descricao(DescricaoTransacaoMapper.entityToDto(transacao.getDescricao()))
+                .formaPagamento(FormaPagamentoMapper.entityToDto(transacao.getFormaPagamento()))
                 .build();
     }
 

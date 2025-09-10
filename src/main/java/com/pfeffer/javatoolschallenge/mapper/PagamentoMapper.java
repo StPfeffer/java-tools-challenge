@@ -3,30 +3,27 @@ package com.pfeffer.javatoolschallenge.mapper;
 import com.pfeffer.javatoolschallenge.domain.dto.PagamentoDTO;
 import com.pfeffer.javatoolschallenge.domain.entity.Transacao;
 import com.pfeffer.javatoolschallenge.domain.request.PagamentoRequest;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
-@Component
-@RequiredArgsConstructor
-public class PagamentoMapper {
+public final class PagamentoMapper {
 
-    private final TransacaoMapper transacaoMapper;
+    private PagamentoMapper() {
+    }
 
-    public Transacao requestToEntity(PagamentoRequest request) {
+    public static Transacao requestToEntity(PagamentoRequest request) {
         if (request == null) {
             return null;
         }
 
-        return transacaoMapper.requestToEntity(request);
+        return TransacaoMapper.requestToEntity(request);
     }
 
-    public PagamentoDTO entityToDto(Transacao transacao) {
+    public static PagamentoDTO entityToDto(Transacao transacao) {
         if (transacao == null) {
             return null;
         }
 
         return PagamentoDTO.builder()
-                .transacao(transacaoMapper.entityToDto(transacao))
+                .transacao(TransacaoMapper.entityToDto(transacao))
                 .build();
     }
 
