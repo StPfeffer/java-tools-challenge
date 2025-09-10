@@ -1,3 +1,7 @@
+[![CI](https://github.com/StPfeffer/java-tools-challenge/actions/workflows/ci.yml/badge.svg)](https://github.com/StPfeffer/java-tools-challenge/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/StPfeffer/java-tools-challenge/actions/workflows/codeql.yml/badge.svg)](https://github.com/StPfeffer/java-tools-challenge/actions/workflows/codeql.yml)
+[![Checkstyle](https://github.com/StPfeffer/java-tools-challenge/actions/workflows/checkstyle.yml/badge.svg)](https://github.com/StPfeffer/java-tools-challenge/actions/workflows/checkstyle.yml)
+
 # API de Pagamentos - Java Tools Challenge
 
 ## Objetivo

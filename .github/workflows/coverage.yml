@@ -28,10 +28,9 @@ jobs:
           restore-keys: ${{ runner.os }}-maven-
 
       - name: Run tests with coverage
-        run: mvn clean install
+        run: mvn -B test
 
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v4
+      - name: Generate JaCoCo Badge
+        uses: cicirello/jacoco-badge-generator@v2
         with:
-          name: coverage-report
-          path: target/site/jacoco
+          generate-branches-badge: true
